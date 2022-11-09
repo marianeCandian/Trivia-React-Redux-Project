@@ -12,10 +12,12 @@ class Login extends React.Component {
   };
 
   buttonDisable = () => {
+    const regex = /\S+@\S+\.\S+/;
     const { name, email } = this.state;
     const resultName = name.length > 0;
     const resultEmail = email.length > 0;
-    const resultFinal = resultName && resultEmail;
+    const regexEmail = !!regex.test(email);
+    const resultFinal = resultName && resultEmail && regexEmail;
     if (resultFinal) {
       this.setState({
         btnEnable: false,
