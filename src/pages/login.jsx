@@ -2,7 +2,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import { connect } from 'react-redux';
 import { loginAction } from '../redux/actions';
-import fetchToken from '../services/api';
+import { fetchToken } from '../services/api';
 
 // const arrToken = [];
 class Login extends React.Component {
