@@ -30,8 +30,7 @@ class Login extends React.Component {
   };
 
   onInputChange = (event) => {
-    const { name, type, checked } = event.target;
-    const value = type === 'checkbox' ? checked : event.target.value;
+    const { name, value } = event.target;
     this.setState({
       [name]: value,
     }, this.buttonDisable());
@@ -55,6 +54,7 @@ class Login extends React.Component {
 
   render() {
     const { name, email, btnEnable } = this.state;
+    const { history } = this.props;
     return (
       <div>
         <input
@@ -68,7 +68,7 @@ class Login extends React.Component {
         <input
           type="text"
           data-testid="input-gravatar-email"
-          placeholder="Insira seu e-mail"
+          placeholder="Insira seu Email"
           name="email"
           value={ email }
           onChange={ this.onInputChange }
@@ -81,6 +81,13 @@ class Login extends React.Component {
         >
           Play
 
+        </button>
+        <button
+          type="button"
+          data-testid="btn-settings"
+          onClick={ () => history.push('/settings') }
+        >
+          SETTINGS
         </button>
       </div>
     );
