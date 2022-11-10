@@ -1,11 +1,15 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import { fetchQuiz } from '../services/api';
+import Loading from './loading';
 
 const ERROR_NUMBER = 3;
 class ContentGames extends React.Component {
   state = {
-    resultData: [],
+    loading: true,
+    results: [],
+    nextQuestion: 0,
+    questionArr: [],
   };
 
   async componentDidMount() {
@@ -18,15 +22,56 @@ class ContentGames extends React.Component {
       history.push('/');
     }
     this.setState({
-      resultData: dataQuiz.results,
+      results: dataQuiz.results,
+      questionArr: this.questionRandom(dataQuiz.results),
+      loading: false,
     });
   }
 
+  questionRandom = (results) => {
+    const correctAnswer = results[0].correct_answer;
+    const incorrectAnswers = results[0].incorrect_answers;
+    const optionList = incorrectAnswers;
+    optionList
+      .splice(Math.floor(Math.random()
+      * (incorrectAnswers.length + 1)), 0, correctAnswer);
+    return [...optionList];
+  };
+
   render() {
-    const { resultData } = this.state;
+    const { results, loading, nextQuestion, questionArr } = this.state;
+    const negative = -1;
+    let index2 = negative;
+    console.log(questionArr);
     return (
       <div>
-        {resultData.map((element, index) => (<p key={ index }>{element.category}</p>))}
+        {loading ? <Loading /> : (
+          <div>
+            <h3>Categoria</h3>
+            <p data-testid="question-category">
+              {results[nextQuestion].category}
+            </p>
+            <h3>Pergunta</h3>
+            <p data-testid="question-text">
+              {results[nextQuestion].question}
+            </p>
+            <div>
+              {questionArr.map((element, index) => {
+                index2 += element === results[nextQuestion].correct_answer ? 0 : 1;
+                return (
+                  <button
+                    type="button"
+                    data-testid={ element === results[nextQuestion].correct_answer
+                      ? 'correct-answer' : `wrong-answer-${index2}` }
+                    key={ index }
+                  >
+                    {element}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        )}
       </div>
     );
   }
