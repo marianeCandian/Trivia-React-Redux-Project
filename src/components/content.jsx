@@ -9,7 +9,6 @@ class ContentGames extends React.Component {
     loading: true,
     results: [],
     nextQuestion: 0,
-    questionArr: [],
   };
 
   async componentDidMount() {
@@ -23,7 +22,7 @@ class ContentGames extends React.Component {
     }
     this.setState({
       results: dataQuiz.results,
-      questionArr: this.questionRandom(dataQuiz.results),
+      // questionArr: this.questionRandom(dataQuiz.results),
       loading: false,
     });
   }
@@ -31,18 +30,17 @@ class ContentGames extends React.Component {
   questionRandom = (results) => {
     const correctAnswer = results[0].correct_answer;
     const incorrectAnswers = results[0].incorrect_answers;
-    const optionList = incorrectAnswers;
-    optionList
-      .splice(Math.floor(Math.random()
-      * (incorrectAnswers.length + 1)), 0, correctAnswer);
-    return [...optionList];
+    const optionList = [correctAnswer, incorrectAnswers];
+    const randomDivision = 0.5;
+    const shuffledAlternatives = optionList
+      .sort(() => Math.random() - randomDivision);
+    return [...shuffledAlternatives];
   };
 
   render() {
-    const { results, loading, nextQuestion, questionArr } = this.state;
+    const { results, loading, nextQuestion } = this.state;
     const negative = -1;
     let index2 = negative;
-    console.log(questionArr);
     return (
       <div>
         {loading ? <Loading /> : (
@@ -55,8 +53,8 @@ class ContentGames extends React.Component {
             <p data-testid="question-text">
               {results[nextQuestion].question}
             </p>
-            <div>
-              {questionArr.map((element, index) => {
+            <div data-testid="answer-options">
+              {this.questionRandom(results).map((element, index) => {
                 index2 += element === results[nextQuestion].correct_answer ? 0 : 1;
                 return (
                   <button
