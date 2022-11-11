@@ -4,13 +4,17 @@ import { fetchQuiz } from '../services/api';
 import Loading from './loading';
 import './button.css';
 
+const FINAL_TIME = '30000';
 const ERROR_NUMBER = 3;
 class ContentGames extends React.Component {
   state = {
+    count: 30,
+    btnDisable: false,
     loading: true,
     results: [],
     nextQuestion: 0,
     response: false,
+    questionArr: [],
   };
 
   async componentDidMount() {
@@ -24,8 +28,10 @@ class ContentGames extends React.Component {
     }
     this.setState({
       results: dataQuiz.results,
+      questionArr: this.questionRandom(dataQuiz.results),
       loading: false,
     });
+    this.initiTimer();
   }
 
   questionRandom = (results) => {
@@ -39,8 +45,27 @@ class ContentGames extends React.Component {
     return [...shuffledAlternatives];
   };
 
+  initiTimer = () => {
+    const { count } = this.state;
+    if (count > 0) {
+      const seconds = 1000;
+      const timerDecrement = setInterval(() => {
+        this.setState((prevState) => ({
+          count: prevState.count - 1,
+        }));
+      }, seconds);
+      setTimeout(() => {
+        clearInterval(timerDecrement);
+        this.setState({
+          btnDisable: true,
+        });
+      }, FINAL_TIME);
+    }
+  };
+
   render() {
-    const { results, loading, nextQuestion, response } = this.state;
+    const { results, loading, nextQuestion, response,
+      btnDisable, count, questionArr } = this.state;
     const negative = -1;
     let index2 = negative;
     return (
@@ -56,7 +81,7 @@ class ContentGames extends React.Component {
               {results[nextQuestion].question}
             </p>
             <div data-testid="answer-options">
-              {this.questionRandom(results).map((element, index) => {
+              {questionArr.map((element, index) => {
                 let classCss = '';
                 if (response) {
                   classCss = element === results[nextQuestion].correct_answer
@@ -69,6 +94,7 @@ class ContentGames extends React.Component {
                     data-testid={ element === results[nextQuestion].correct_answer
                       ? 'correct-answer' : `wrong-answer-${index2}` }
                     key={ index }
+                    disabled={ btnDisable }
                     className={ classCss }
                     onClick={
                       () => this.setState({
@@ -80,7 +106,9 @@ class ContentGames extends React.Component {
                   </button>
                 );
               })}
+
             </div>
+            <span>{count}</span>
           </div>
         )}
       </div>
@@ -93,4 +121,5 @@ ContentGames.propTypes = {
     push: PropTypes.func.isRequired,
   }).isRequired,
 };
+
 export default ContentGames;
