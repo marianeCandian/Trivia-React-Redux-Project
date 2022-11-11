@@ -25,12 +25,13 @@ class ContentGames extends React.Component {
     if (dataQuiz.response_code === ERROR_NUMBER) {
       localStorage.removeItem('token');
       history.push('/');
+    } else {
+      this.setState({
+        results: dataQuiz.results,
+        questionArr: this.questionRandom(dataQuiz.results),
+        loading: false,
+      });
     }
-    this.setState({
-      results: dataQuiz.results,
-      questionArr: this.questionRandom(dataQuiz.results),
-      loading: false,
-    });
     this.initiTimer();
   }
 
