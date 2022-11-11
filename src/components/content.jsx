@@ -2,6 +2,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import { fetchQuiz } from '../services/api';
 import Loading from './loading';
+import './button.css';
 
 const ERROR_NUMBER = 3;
 class ContentGames extends React.Component {
@@ -9,6 +10,7 @@ class ContentGames extends React.Component {
     loading: true,
     results: [],
     nextQuestion: 0,
+    response: false,
   };
 
   async componentDidMount() {
@@ -22,7 +24,6 @@ class ContentGames extends React.Component {
     }
     this.setState({
       results: dataQuiz.results,
-      // questionArr: this.questionRandom(dataQuiz.results),
       loading: false,
     });
   }
@@ -30,15 +31,16 @@ class ContentGames extends React.Component {
   questionRandom = (results) => {
     const correctAnswer = results[0].correct_answer;
     const incorrectAnswers = results[0].incorrect_answers;
-    const optionList = [correctAnswer, incorrectAnswers];
+    const optionList = [correctAnswer, ...incorrectAnswers];
     const randomDivision = 0.5;
     const shuffledAlternatives = optionList
       .sort(() => Math.random() - randomDivision);
+    console.log(shuffledAlternatives);
     return [...shuffledAlternatives];
   };
 
   render() {
-    const { results, loading, nextQuestion } = this.state;
+    const { results, loading, nextQuestion, response } = this.state;
     const negative = -1;
     let index2 = negative;
     return (
@@ -55,6 +57,11 @@ class ContentGames extends React.Component {
             </p>
             <div data-testid="answer-options">
               {this.questionRandom(results).map((element, index) => {
+                let classCss = '';
+                if (response) {
+                  classCss = element === results[nextQuestion].correct_answer
+                    ? 'correctAnswer' : 'incorrectAnswer';
+                }
                 index2 += element === results[nextQuestion].correct_answer ? 0 : 1;
                 return (
                   <button
@@ -62,6 +69,12 @@ class ContentGames extends React.Component {
                     data-testid={ element === results[nextQuestion].correct_answer
                       ? 'correct-answer' : `wrong-answer-${index2}` }
                     key={ index }
+                    className={ classCss }
+                    onClick={
+                      () => this.setState({
+                        response: true,
+                      })
+                    }
                   >
                     {element}
                   </button>
