@@ -13,6 +13,7 @@ class ContentGames extends React.Component {
     results: [],
     nextQuestion: 0,
     response: false,
+    questionArr: [],
   };
 
   async componentDidMount() {
@@ -26,6 +27,7 @@ class ContentGames extends React.Component {
     }
     this.setState({
       results: dataQuiz.results,
+      questionArr: this.questionRandom(dataQuiz.results),
       loading: false,
     });
     this.initiTimer();
@@ -61,7 +63,8 @@ class ContentGames extends React.Component {
   };
 
   render() {
-    const { results, loading, nextQuestion, response, btnDisable, count } = this.state;
+    const { results, loading, nextQuestion, response,
+      btnDisable, count, questionArr } = this.state;
     const negative = -1;
     let index2 = negative;
     return (
@@ -77,7 +80,7 @@ class ContentGames extends React.Component {
               {results[nextQuestion].question}
             </p>
             <div data-testid="answer-options">
-              {this.questionRandom(results).map((element, index) => {
+              {questionArr.map((element, index) => {
                 let classCss = '';
                 if (response) {
                   classCss = element === results[nextQuestion].correct_answer
