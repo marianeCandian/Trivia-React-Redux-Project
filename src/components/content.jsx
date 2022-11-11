@@ -66,7 +66,6 @@ class ContentGames extends React.Component {
   render() {
     const { results, loading, nextQuestion, response,
       btnDisable, count, questionArr } = this.state;
-    const { results, loading, nextQuestion, response } = this.state;
     const negative = -1;
     let index2 = negative;
     return (
