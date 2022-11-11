@@ -1,12 +1,14 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import { connect } from 'react-redux';
 import { fetchQuiz } from '../services/api';
 import Loading from './loading';
 
+const FINAL_TIME = '30000';
 const ERROR_NUMBER = 3;
 class ContentGames extends React.Component {
   state = {
+    count: 30,
+    btnDisable: false,
     loading: true,
     results: [],
     nextQuestion: 0,
@@ -26,6 +28,7 @@ class ContentGames extends React.Component {
       results: dataQuiz.results,
       loading: false,
     });
+    this.initiTimer();
   }
 
   questionRandom = (results) => {
@@ -39,11 +42,28 @@ class ContentGames extends React.Component {
     return [...shuffledAlternatives];
   };
 
+  initiTimer = () => {
+    const { count } = this.state;
+    if (count > 0) {
+      const seconds = 1000;
+      const timerDecrement = setInterval(() => {
+        this.setState((prevState) => ({
+          count: prevState.count - 1,
+        }));
+      }, seconds);
+      setTimeout(() => {
+        clearInterval(timerDecrement);
+        this.setState({
+          btnDisable: true,
+        });
+      }, FINAL_TIME);
+    }
+  };
+
   render() {
-    const { results, loading, nextQuestion, response } = this.state;
+    const { results, loading, nextQuestion, response, btnDisable, count } = this.state;
     const negative = -1;
     let index2 = negative;
-    const { time } = this.props;
     return (
       <div>
         {loading ? <Loading /> : (
@@ -70,7 +90,7 @@ class ContentGames extends React.Component {
                     data-testid={ element === results[nextQuestion].correct_answer
                       ? 'correct-answer' : `wrong-answer-${index2}` }
                     key={ index }
-                    disabled={ time === 0 }
+                    disabled={ btnDisable }
                     className={ classCss }
                     onClick={
                       () => this.setState({
@@ -82,7 +102,9 @@ class ContentGames extends React.Component {
                   </button>
                 );
               })}
+
             </div>
+            <span>{count}</span>
           </div>
         )}
       </div>
@@ -94,11 +116,6 @@ ContentGames.propTypes = {
   history: PropTypes.shape({
     push: PropTypes.func.isRequired,
   }).isRequired,
-  time: PropTypes.number.isRequired,
 };
 
-const mapStateToProps = (state) => ({
-  time: state.reduceTime.time,
-});
-
-export default connect(mapStateToProps)(ContentGames);
+export default ContentGames;
