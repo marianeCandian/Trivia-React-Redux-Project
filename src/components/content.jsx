@@ -2,6 +2,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import { fetchQuiz } from '../services/api';
 import Loading from './loading';
+import './button.css';
 
 const FINAL_TIME = '30000';
 const ERROR_NUMBER = 3;
@@ -65,6 +66,7 @@ class ContentGames extends React.Component {
   render() {
     const { results, loading, nextQuestion, response,
       btnDisable, count, questionArr } = this.state;
+    const { results, loading, nextQuestion, response } = this.state;
     const negative = -1;
     let index2 = negative;
     return (
