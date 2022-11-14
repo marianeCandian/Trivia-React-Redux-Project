@@ -1,8 +1,10 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import { connect } from 'react-redux';
 import { fetchQuiz } from '../services/api';
 import Loading from './loading';
 import './button.css';
+import { scoreAction } from '../redux/actions';
 
 const FINAL_TIME = '30000';
 const ERROR_NUMBER = 3;
@@ -64,6 +66,31 @@ class ContentGames extends React.Component {
     }
   };
 
+  checkQuestion = (event) => {
+    const { dispatch } = this.props;
+    const { count, results, nextQuestion } = this.state;
+    // const { difficulty } = results[0];
+
+    if (event.target.getAttribute('data-testid') === 'correct-answer') {
+      const baseScore = 10;
+      const hard = 3;
+      const medium = 2;
+      const easy = 1;
+      let level = 0;
+      if (results[nextQuestion].difficulty === 'hard') {
+        level = hard;
+      } else if (results[nextQuestion].difficulty === 'medium') {
+        level = medium;
+      } else {
+        level = easy;
+      }
+      dispatch(scoreAction(baseScore + (count * level)));
+    }
+    this.setState({
+      response: true,
+    });
+  };
+
   render() {
     const { results, loading, nextQuestion, response,
       btnDisable, count, questionArr } = this.state;
@@ -98,9 +125,7 @@ class ContentGames extends React.Component {
                     disabled={ btnDisable }
                     className={ classCss }
                     onClick={
-                      () => this.setState({
-                        response: true,
-                      })
+                      this.checkQuestion
                     }
                   >
                     {element}
@@ -118,9 +143,10 @@ class ContentGames extends React.Component {
 }
 
 ContentGames.propTypes = {
+  dispatch: PropTypes.func.isRequired,
   history: PropTypes.shape({
     push: PropTypes.func.isRequired,
   }).isRequired,
 };
 
-export default ContentGames;
+export default connect()(ContentGames);
