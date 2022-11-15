@@ -1,11 +1,14 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import { connect } from 'react-redux';
 import { fetchQuiz } from '../services/api';
 import Loading from './loading';
 import './button.css';
+import { scoreAction } from '../redux/actions';
 
 const FINAL_TIME = '30000';
 const ERROR_NUMBER = 3;
+const FINAL_QUESTION = 3;
 class ContentGames extends React.Component {
   state = {
     count: 30,
@@ -15,6 +18,7 @@ class ContentGames extends React.Component {
     nextQuestion: 0,
     response: false,
     questionArr: [],
+    btnNext: false,
   };
 
   async componentDidMount() {
@@ -26,24 +30,44 @@ class ContentGames extends React.Component {
       localStorage.removeItem('token');
       history.push('/');
     } else {
+      this.questionRandom(dataQuiz.results);
       this.setState({
         results: dataQuiz.results,
-        questionArr: this.questionRandom(dataQuiz.results),
+        // questionArr: ,
         loading: false,
       });
     }
     this.initiTimer();
   }
 
+  nextQues = () => {
+    const { history } = this.props;
+    const { results, nextQuestion } = this.state;
+    this.setState((prevState) => ({
+      nextQuestion: prevState.nextQuestion + 1,
+      response: false,
+      count: 30,
+    }), () => {
+      if (nextQuestion === FINAL_QUESTION) {
+        history.push('/feedback');
+      }
+      this.questionRandom(results);
+    });
+  };
+
   questionRandom = (results) => {
-    const correctAnswer = results[0].correct_answer;
-    const incorrectAnswers = results[0].incorrect_answers;
+    const { nextQuestion } = this.state;
+    const correctAnswer = results[nextQuestion].correct_answer;
+    const incorrectAnswers = results[nextQuestion].incorrect_answers;
     const optionList = [correctAnswer, ...incorrectAnswers];
     const randomDivision = 0.5;
     const shuffledAlternatives = optionList
       .sort(() => Math.random() - randomDivision);
     console.log(shuffledAlternatives);
-    return [...shuffledAlternatives];
+    this.setState({
+      questionArr: shuffledAlternatives,
+    });
+    // return [...shuffledAlternatives];
   };
 
   initiTimer = () => {
@@ -64,9 +88,35 @@ class ContentGames extends React.Component {
     }
   };
 
+  checkQuestion = (event) => {
+    const { dispatch } = this.props;
+    const { count, results, nextQuestion } = this.state;
+    // const { difficulty } = results[0];
+
+    if (event.target.getAttribute('data-testid') === 'correct-answer') {
+      const baseScore = 10;
+      const hard = 3;
+      const medium = 2;
+      const easy = 1;
+      let level = 0;
+      if (results[nextQuestion].difficulty === 'hard') {
+        level = hard;
+      } else if (results[nextQuestion].difficulty === 'medium') {
+        level = medium;
+      } else {
+        level = easy;
+      }
+      dispatch(scoreAction(baseScore + (count * level)));
+    }
+    this.setState({
+      response: true,
+      btnNext: true,
+    });
+  };
+
   render() {
     const { results, loading, nextQuestion, response,
-      btnDisable, count, questionArr } = this.state;
+      btnDisable, count, questionArr, btnNext } = this.state;
     const negative = -1;
     let index2 = negative;
     return (
@@ -98,16 +148,28 @@ class ContentGames extends React.Component {
                     disabled={ btnDisable }
                     className={ classCss }
                     onClick={
-                      () => this.setState({
-                        response: true,
-                      })
+                      this.checkQuestion
                     }
                   >
                     {element}
                   </button>
                 );
               })}
-
+              <div>
+                {btnNext
+                 && (
+                   <div>
+                     <button
+                       type="button"
+                       data-testid="btn-next"
+                       onClick={
+                         this.nextQues
+                       }
+                     >
+                       Next
+                     </button>
+                   </div>)}
+              </div>
             </div>
             <span>{count}</span>
           </div>
@@ -118,9 +180,10 @@ class ContentGames extends React.Component {
 }
 
 ContentGames.propTypes = {
+  dispatch: PropTypes.func.isRequired,
   history: PropTypes.shape({
     push: PropTypes.func.isRequired,
   }).isRequired,
 };
 
-export default ContentGames;
+export default connect()(ContentGames);
