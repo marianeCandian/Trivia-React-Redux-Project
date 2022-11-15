@@ -4,7 +4,7 @@ import { connect } from 'react-redux';
 import { fetchQuiz } from '../services/api';
 import Loading from './loading';
 import './button.css';
-import { scoreAction } from '../redux/actions';
+import { assertionAction, scoreAction } from '../redux/actions';
 
 const FINAL_TIME = '30000';
 const ERROR_NUMBER = 3;
@@ -19,6 +19,7 @@ class ContentGames extends React.Component {
     response: false,
     questionArr: [],
     btnNext: false,
+    assertionLocal: 0,
   };
 
   async componentDidMount() {
@@ -41,8 +42,8 @@ class ContentGames extends React.Component {
   }
 
   nextQues = () => {
-    const { history } = this.props;
-    const { results, nextQuestion } = this.state;
+    const { history, dispatch } = this.props;
+    const { results, nextQuestion, assertionLocal } = this.state;
     this.setState((prevState) => ({
       nextQuestion: prevState.nextQuestion + 1,
       response: false,
@@ -50,6 +51,7 @@ class ContentGames extends React.Component {
     }), () => {
       if (nextQuestion === FINAL_QUESTION) {
         history.push('/feedback');
+        dispatch(assertionAction(assertionLocal));
       }
       this.questionRandom(results);
     });
@@ -94,6 +96,9 @@ class ContentGames extends React.Component {
     // const { difficulty } = results[0];
 
     if (event.target.getAttribute('data-testid') === 'correct-answer') {
+      this.setState((prev) => ({
+        assertionLocal: prev.assertionLocal + 1,
+      }));
       const baseScore = 10;
       const hard = 3;
       const medium = 2;
