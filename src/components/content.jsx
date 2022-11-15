@@ -8,7 +8,7 @@ import { scoreAction } from '../redux/actions';
 
 const FINAL_TIME = '30000';
 const ERROR_NUMBER = 3;
-const FINAL_QUESTION = 4;
+const FINAL_QUESTION = 3;
 class ContentGames extends React.Component {
   state = {
     count: 30,
@@ -46,11 +46,12 @@ class ContentGames extends React.Component {
     this.setState((prevState) => ({
       nextQuestion: prevState.nextQuestion + 1,
       response: false,
+      count: 30,
     }), () => {
-      this.questionRandom(results);
       if (nextQuestion === FINAL_QUESTION) {
         history.push('/feedback');
       }
+      this.questionRandom(results);
     });
   };
 
