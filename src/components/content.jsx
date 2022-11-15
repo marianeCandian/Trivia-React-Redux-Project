@@ -8,7 +8,7 @@ import { assertionAction, scoreAction } from '../redux/actions';
 
 const FINAL_TIME = '30000';
 const ERROR_NUMBER = 3;
-const FINAL_QUESTION = 3;
+const FINAL_QUESTION = 4;
 class ContentGames extends React.Component {
   state = {
     count: 30,
@@ -44,15 +44,15 @@ class ContentGames extends React.Component {
   nextQues = () => {
     const { history, dispatch } = this.props;
     const { results, nextQuestion, assertionLocal } = this.state;
+    if (nextQuestion === FINAL_QUESTION) {
+      dispatch(assertionAction(assertionLocal));
+      return history.push('/feedback');
+    }
     this.setState((prevState) => ({
       nextQuestion: prevState.nextQuestion + 1,
       response: false,
       count: 30,
     }), () => {
-      if (nextQuestion === FINAL_QUESTION) {
-        history.push('/feedback');
-        dispatch(assertionAction(assertionLocal));
-      }
       this.questionRandom(results);
     });
   };
