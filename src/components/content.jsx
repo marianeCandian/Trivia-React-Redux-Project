@@ -52,6 +52,7 @@ class ContentGames extends React.Component {
       nextQuestion: prevState.nextQuestion + 1,
       response: false,
       count: 30,
+      btnDisable: false,
     }), () => {
       this.questionRandom(results);
     });
@@ -94,7 +95,9 @@ class ContentGames extends React.Component {
     const { dispatch } = this.props;
     const { count, results, nextQuestion } = this.state;
     // const { difficulty } = results[0];
-
+    this.setState({
+      btnDisable: true,
+    });
     if (event.target.getAttribute('data-testid') === 'correct-answer') {
       this.setState((prev) => ({
         assertionLocal: prev.assertionLocal + 1,
