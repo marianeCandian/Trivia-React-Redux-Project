@@ -4,9 +4,8 @@ import { connect } from 'react-redux';
 import { fetchQuiz } from '../services/api';
 import Loading from './loading';
 import './button.css';
-import { scoreAction } from '../redux/actions';
+import { assertionAction, scoreAction } from '../redux/actions';
 
-const FINAL_TIME = '30000';
 const ERROR_NUMBER = 3;
 const FINAL_QUESTION = 4;
 class ContentGames extends React.Component {
@@ -19,6 +18,7 @@ class ContentGames extends React.Component {
     response: false,
     questionArr: [],
     btnNext: false,
+    assertionLocal: 0,
   };
 
   async componentDidMount() {
@@ -40,18 +40,32 @@ class ContentGames extends React.Component {
     this.initiTimer();
   }
 
+  componentDidUpdate(prev, state) {
+    if (state.count === 1) {
+      clearInterval(this.timerDecrement);
+      this.setState({
+        btnDisable: true,
+      });
+    }
+  }
+
   nextQues = () => {
-    const { history } = this.props;
-    const { results, nextQuestion } = this.state;
+    const { history, dispatch } = this.props;
+    const { results, nextQuestion, assertionLocal } = this.state;
+    if (nextQuestion === FINAL_QUESTION) {
+      dispatch(assertionAction(assertionLocal));
+      return history.push('/feedback');
+    }
     this.setState((prevState) => ({
       nextQuestion: prevState.nextQuestion + 1,
       response: false,
+      count: 30,
+      btnDisable: false,
     }), () => {
       this.questionRandom(results);
-      if (nextQuestion === FINAL_QUESTION) {
-        history.push('/feedback');
-      }
     });
+    clearInterval(this.timerDecrement);
+    this.initiTimer();
   };
 
   questionRandom = (results) => {
@@ -73,17 +87,11 @@ class ContentGames extends React.Component {
     const { count } = this.state;
     if (count > 0) {
       const seconds = 1000;
-      const timerDecrement = setInterval(() => {
+      this.timerDecrement = setInterval(() => {
         this.setState((prevState) => ({
           count: prevState.count - 1,
         }));
       }, seconds);
-      setTimeout(() => {
-        clearInterval(timerDecrement);
-        this.setState({
-          btnDisable: true,
-        });
-      }, FINAL_TIME);
     }
   };
 
@@ -91,8 +99,13 @@ class ContentGames extends React.Component {
     const { dispatch } = this.props;
     const { count, results, nextQuestion } = this.state;
     // const { difficulty } = results[0];
-
+    this.setState({
+      btnDisable: true,
+    });
     if (event.target.getAttribute('data-testid') === 'correct-answer') {
+      this.setState((prev) => ({
+        assertionLocal: prev.assertionLocal + 1,
+      }));
       const baseScore = 10;
       const hard = 3;
       const medium = 2;

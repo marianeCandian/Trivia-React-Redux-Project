@@ -1,9 +1,10 @@
-import { LOGIN_ACTION, SCORE_ACTION } from '../actions';
+import { ASSERTION_ACTION, LOGIN_ACTION, SCORE_ACTION } from '../actions';
 
 const INITIAL_STATE = {
   email: '',
   name: '',
   score: 0,
+  assertions: 0,
 };
 
 const player = (state = INITIAL_STATE, action) => {
@@ -17,6 +18,11 @@ const player = (state = INITIAL_STATE, action) => {
     return {
       ...state,
       score: state.score + action.score,
+    };
+  case ASSERTION_ACTION:
+    return {
+      ...state,
+      assertions: state.assertions + action.assertions,
     };
   default:
     return state;
