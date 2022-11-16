@@ -7,28 +7,16 @@ const minAssert = 3;
 
 class Feedback extends React.Component {
   render() {
-    const { assertion, score, history } = this.props;
+    const { assertions, score, history } = this.props;
     return (
       <div>
         <Header />
         <div>
-          { assertion < minAssert ? (
+          { assertions < minAssert ? (
             <p data-testid="feedback-text">Could be better...</p>)
             : <p data-testid="feedback-text">Well Done!</p> }
-        </div>
-        <div>
-          <h3>Seu desempenho</h3>
-          <p
-            data-testid="feedback-total-score"
-          >
-            {score}
-          </p>
-          <p
-            data-testid="feedback-total-question"
-          >
-            {assertion}
-          </p>
-
+          <p data-testid="feedback-total-score">{score}</p>
+          <p data-testid="feedback-total-question">{assertions}</p>
         </div>
         <div>
           <button
@@ -52,14 +40,14 @@ class Feedback extends React.Component {
 }
 
 Feedback.propTypes = {
-  assertion: PropTypes.number.isRequired,
+  assertions: PropTypes.number.isRequired,
   history: PropTypes.shape({
     push: PropTypes.func.isRequired,
   }).isRequired,
   score: PropTypes.number.isRequired,
 };
 const mapStateToProps = (globalState) => ({
-  assertion: globalState.player.assertion,
+  assertions: globalState.player.assertions,
   score: globalState.player.score,
 });
 export default connect(mapStateToProps)(Feedback);
