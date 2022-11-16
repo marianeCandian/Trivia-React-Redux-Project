@@ -7,7 +7,7 @@ const minAssert = 3;
 
 class Feedback extends React.Component {
   render() {
-    const { assertion, score } = this.props;
+    const { assertion, score, history } = this.props;
     return (
       <div>
         <Header />
@@ -30,6 +30,15 @@ class Feedback extends React.Component {
           </span>
 
         </div>
+        <div>
+          <button
+            data-testid="btn-play-again"
+            type="button"
+            onClick={ () => history.push('/') }
+          >
+            Play Again
+          </button>
+        </div>
       </div>
     );
   }
@@ -37,6 +46,9 @@ class Feedback extends React.Component {
 
 Feedback.propTypes = {
   assertion: PropTypes.number.isRequired,
+  history: PropTypes.shape({
+    push: PropTypes.func.isRequired,
+  }).isRequired,
   score: PropTypes.number.isRequired,
 };
 const mapStateToProps = (globalState) => ({
