@@ -13,7 +13,7 @@ export const scoreAction = (score) => ({
   score,
 });
 
-export const assertionAction = (assertion) => ({
+export const assertionAction = (assertions) => ({
   type: ASSERTION_ACTION,
-  assertion,
+  assertions,
 });
