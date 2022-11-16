@@ -18,16 +18,16 @@ class Feedback extends React.Component {
         </div>
         <div>
           <h3>Seu desempenho</h3>
-          <span
+          <p
             data-testid="feedback-total-score"
           >
             {score}
-          </span>
-          <span
+          </p>
+          <p
             data-testid="feedback-total-question"
           >
             {assertion}
-          </span>
+          </p>
 
         </div>
         <div>

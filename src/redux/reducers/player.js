@@ -22,7 +22,7 @@ const player = (state = INITIAL_STATE, action) => {
   case ASSERTION_ACTION:
     return {
       ...state,
-      assertion: action.assertion,
+      assertion: state.assertion + action.assertion,
     };
   default:
     return state;

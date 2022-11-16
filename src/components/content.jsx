@@ -6,7 +6,6 @@ import Loading from './loading';
 import './button.css';
 import { assertionAction, scoreAction } from '../redux/actions';
 
-const FINAL_TIME = '30000';
 const ERROR_NUMBER = 3;
 const FINAL_QUESTION = 4;
 class ContentGames extends React.Component {
@@ -41,6 +40,15 @@ class ContentGames extends React.Component {
     this.initiTimer();
   }
 
+  componentDidUpdate(prev, state) {
+    if (state.count === 1) {
+      clearInterval(this.timerDecrement);
+      this.setState({
+        btnDisable: true,
+      });
+    }
+  }
+
   nextQues = () => {
     const { history, dispatch } = this.props;
     const { results, nextQuestion, assertionLocal } = this.state;
@@ -56,6 +64,8 @@ class ContentGames extends React.Component {
     }), () => {
       this.questionRandom(results);
     });
+    clearInterval(this.timerDecrement);
+    this.initiTimer();
   };
 
   questionRandom = (results) => {
@@ -77,17 +87,11 @@ class ContentGames extends React.Component {
     const { count } = this.state;
     if (count > 0) {
       const seconds = 1000;
-      const timerDecrement = setInterval(() => {
+      this.timerDecrement = setInterval(() => {
         this.setState((prevState) => ({
           count: prevState.count - 1,
         }));
       }, seconds);
-      setTimeout(() => {
-        clearInterval(timerDecrement);
-        this.setState({
-          btnDisable: true,
-        });
-      }, FINAL_TIME);
     }
   };
 
